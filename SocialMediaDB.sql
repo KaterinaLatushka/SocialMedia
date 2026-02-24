@@ -1,0 +1,8 @@
+DROP DATABASE IF EXISTS SocialMediaDB;
+CREATE DATABASE SocialMediaDB;
+USE SocialMediaDB;
+
+CREATE TABLE Users (
+    username VARCHAR(50) PRIMARY KEY,
+    password VARCHAR(50) NOT NULL
+);
