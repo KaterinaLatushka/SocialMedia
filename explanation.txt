@@ -1,0 +1,62 @@
+Explanation of Login Security Update
+
+1. What the system originally did
+
+Originally, the login system:
+Stored passwords in plain text inside the database (e.g., 12345)
+Compared the typed password directly in SQL:
+SELECT * FROM Users WHERE username='$username' AND password='$password'
+This approach is insecure because:
+If the database is compromised, attackers can see all real passwords.
+It is vulnerable to SQL injection attacks.
+It does not follow modern password security standards.
+
+2. What I changed
+
+To improve security, I updated the login system to:
+Store hashed passwords instead of plain text
+Use PHP’s password_hash() to generate secure hashes
+Use password_verify() to validate passwords
+Use prepared statements to prevent SQL injection
+
+3. How hashed passwords were generated
+
+To generate secure password hashes, I used PHP’s built-in function:
+password_hash("12345", PASSWORD_DEFAULT);
+This function:
+Uses a strong one-way hashing algorithm (currently bcrypt by default)
+Automatically generates a random salt
+Produces a long hash string (around 60 characters)
+Returns a value that looks like:
+$2y$10$rSIpiZAfT.4W6dekETVDveFyB3/R1O4Mjh12gWdZM/ZFurWhLbzz.
+I generated hashes for each user’s password and replaced the plain-text values in the database with these hashed strings.
+
+4. How password validation now works
+
+Instead of comparing passwords directly, the system now:
+Retrieves the stored hashed password from the database.
+Uses:
+password_verify($password, $stored_hash)
+password_verify():
+Takes the user’s typed password
+Hashes it internally using the same algorithm and salt
+Compares it securely to the stored hash
+Returns true if they match
+Because hashing is one-way, the original password cannot be retrieved from the stored hash. It can only be verified.
+
+5. Why this works and is secure
+
+This approach is secure because:
+Even if the database is compromised, attackers only see hashed values.
+The hashing algorithm includes a random salt, so identical passwords produce different hashes.
+password_verify() handles algorithm consistency automatically.
+Prepared statements prevent SQL injection attacks.
+This follows modern best practices for password storage and authentication in PHP.
+
+Final Result
+
+The updated login system now:
+Stores passwords securely using hashing
+Validates passwords using password_verify()
+Prevents SQL injection using prepared statements
+Meets modern password security standards
